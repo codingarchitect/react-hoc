@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import applyState from './hoc-wrappers/with-state';
+import applyState from './hoc-wrappers/with-state.jsx';
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case '@@INIT': return { count: 0 };
+    case '@@INIT': return { count: action.payload.props.initialCount };
     case 'INC': return { count: state.count + 1 };
     case 'DEC': return { count: state.count - 1 };
     default:
@@ -13,15 +13,20 @@ const reducer = (state, action) => {
   return state;
 };
 
-const Counter = ({ count, actionCreators }) => (<div>
-  <button onClick={actionCreators('DEC')}>-</button>
+const Counter = ({ count, localDispatch }) => (<div>
+  <button onClick={localDispatch('DEC')}>-</button>
   Counter: {count}
-  <button onClick={actionCreators('INC')}>+</button>
+  <button onClick={localDispatch('INC')}>+</button>
 </div>);
 
 Counter.propTypes = {
+  initialCount: PropTypes.number, // eslint-disable-line
   count: PropTypes.number.isRequired,
-  actionCreators: PropTypes.func.isRequired,
+  localDispatch: PropTypes.func.isRequired,
 };
 
-export default applyState(reducer, Counter);
+Counter.defaultProps = {
+  initialCount: 0,
+};
+
+export default applyState(reducer)(Counter);

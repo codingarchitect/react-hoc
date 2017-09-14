@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { cond, equals, T } from 'ramda';
-import applyState from './hoc-wrappers/with-state.jsx';
+import withState from './hoc-wrappers/with-state.jsx';
 
 const reducer = (state, action) => cond([
   [equals('@@INIT'), () => ({ count: action.payload.props.initialCount })],
@@ -11,9 +11,9 @@ const reducer = (state, action) => cond([
 ])(action.type);
 
 const Counter = ({ count, localDispatch }) => (<div>
-  <button onClick={localDispatch('DEC')}>-</button>
+  <button id="decrementCounter" onClick={localDispatch('DEC')}>-</button>
   Counter: {count}
-  <button onClick={localDispatch('INC1')}>+</button>
+  <button id="incrementCounter" onClick={localDispatch('INC')}>+</button>
 </div>);
 
 Counter.propTypes = {
@@ -26,4 +26,4 @@ Counter.defaultProps = {
   initialCount: 0,
 };
 
-export default applyState(reducer)(Counter);
+export default withState(reducer)(Counter);

@@ -8,7 +8,7 @@
 /* eslint better/explicit-return: 0 */
 /* eslint react/prefer-stateless-function: 0 */
 import React from 'react';
-
+import { defaultTo } from 'ramda';
 /**
  * applyState is a higher order component that takes
  * a local reducer and returns a
@@ -17,21 +17,20 @@ import React from 'react';
  * @param {any} reducer - a local reducer
  * @returns a higher order function that takes the component to add state to
  */
-export default function applyState(reducer) {
-  return function StateComponentFactory(ComponentToAddState) {
+export default function withState(reducer) {
+  return function stateComponentFactory(ComponentToAddState) {
     class ComponentWithState extends React.Component {
       componentWillMount() {
         this.localDispatch('@@INIT')();
       }
-      componentWillReceiveProps(nextProps) {
-        this.localDispatch('@@PROPS_CHANGED')(nextProps);
-      }
       cache = {};
       localDispatch = type => this.cache[type] || (this.cache[type] = (additionalPayload) => {
-        this.setState(reducer(this.state, {
-          type,
-          payload: { additionalPayload, props: this.props },
-        }));
+        if (typeof reducer === 'function') {
+          this.setState(reducer(defaultTo({}, this.state), {
+            type,
+            payload: { additionalPayload, props: this.props },
+          }));
+        }
       });
       render() {
         return (<ComponentToAddState
